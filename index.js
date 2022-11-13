@@ -22,7 +22,9 @@ const io = new Server({
 let onlineUsers = []
 // Helper functions
 const addUser = (userId, socketId) => {
-    !onlineUsers.some((user) => user.id === userId) && onlineUsers.push({userId, socketId})
+    onlineUsers.filter((user) => user.id !== userId)
+    onlineUsers.push({userId, socketId})
+    // !onlineUsers.some((user) => user.id === userId) && onlineUsers.push({userId, socketId})
 }
 const removeUser = (socketId) => {
     onlineUsers = onlineUsers.filter(user => user.socketId !== socketId)
@@ -35,19 +37,18 @@ const findUser = (userId) => {
 // Connection
 io.on("connection", (socket) => {
     console.log("user got connected")
-    console.log(onlineUsers)
-    // Listen to "addUser" event sent from client and grab currentUserId and its socketId
+    // Listen to "addUser" event sent from client and grab currentUserId and its socketId push to online users
     socket.on("addUser", (userId) => {
         addUser(userId, socket.id)
+        // console.log("from socket, USERS :>>>", onlineUsers)
         // and Send "getUser" event to client with updated users collection
         io.emit("getUsers", onlineUsers)
     })
 
-
     // Send And Get Message
     socket.on("sendMessage", (receiverId, message) => {
         const receiver = findUser(receiverId)
-        io.to(receiver.socketId).emit("getMessage", message)
+        receiver && io.to(receiver.socketId).emit("getMessage", message)
     })
 
 
