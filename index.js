@@ -1,15 +1,3 @@
-// const io = require("socket.io")(8900, {
-//     cors: {
-//         origin: "http://localhost:3000"
-//     },
-// })
-//
-// io.on("connection", (socket) => {
-//     console.log("User got connected!")
-// })
-
-// ============================
-
 const {Server} = require("socket.io")
 
 // Configuration
@@ -24,7 +12,6 @@ let onlineUsers = []
 const addUser = (userId, socketId) => {
     onlineUsers.filter((user) => user.id !== userId)
     onlineUsers.push({userId, socketId})
-    // !onlineUsers.some((user) => user.id === userId) && onlineUsers.push({userId, socketId})
 }
 const removeUser = (socketId) => {
     onlineUsers = onlineUsers.filter(user => user.socketId !== socketId)
@@ -40,7 +27,6 @@ io.on("connection", (socket) => {
     // Listen to "addUser" event sent from client and grab currentUserId and its socketId push to online users
     socket.on("addUser", (userId) => {
         addUser(userId, socket.id)
-        // console.log("from socket, USERS :>>>", onlineUsers)
         // and Send "getUser" event to client with updated users collection
         io.emit("getUsers", onlineUsers)
     })
